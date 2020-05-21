@@ -1,0 +1,26 @@
+Beim Start des Webservers wird ein Verzeichnis angegeben, dessen Dateien er ausliefern soll (Root-Verzeichnis). 
+rt der Dateien: HTML, CSS, JavaScript. Der Webserver soll die Dateien, aus der die Webanwendung besteht, liefern.
+
+Außerdem kann der Server die Umrisse der Land- und Stadtkreise Deutschlands (nachfolgende Geodaten genannt), 
+die sich in der Datei map_data.js befinden, im JSON-Format liefern. Diese Daten werden vor der Lieferung in Web-Mercator-Koordinaten umgerechnet.
+
+Der Endpunkt für die Geodaten lautet /mapdata. Die Anfrage hat einen Querystring mit folgenden Schlüsseln:
+
+BL_ID: ID des Bundeslands, 0 für alle Bundesländer
+
+resolution: high, medium, low
+
+zoom: Zoomebene (0,1,2,3,…​)
+
+Beispiel: Auf die Anfrage /mapdata?BL_ID=10&resolution=medium&zoom=3 liefert der Server die Geodaten 
+aller Kreise des Saarlandes mit mittlerer Auflösung in Web-Mercator-Koordinaten auf Zoomebene 3.
+
+BL_ID: laut Datei map-data.js
+
+resolution: high ist die in der Datei map-data.js vorhandene Aufösung. medium und low entstehen 
+daraus durch Weglassen von Punkten (Ausdünnen). Wie die Auflösung medium und low aussieht, ist Ihnen überlassen. 
+Es sollte aber ein sichtbarer Unterschied bestehen. Das Ausdünnen der Daten soll mit dem Algorithmus von Ramer–Douglas–Peucker erfolgen.
+
+zoom: Zoomlevel in der Formel Web-Mercator-Koordinaten
+
+Die Webanwendung soll die Geodaten als Karte anzeigen. Die Benutzerin soll die drei Parameter des Querystrings interaktiv wählen können.

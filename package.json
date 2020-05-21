@@ -1,0 +1,16 @@
+{
+  "name": "map-server-package",
+  "version": "1.0.0",
+  "description": "Webanwendungen rules",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js",
+    "start": "node server.js",
+    "main": "node main.js"
+  },
+  "keywords": [
+    "server"
+  ],
+  "author": "mehrere",
+  "license": "ISC"
+}

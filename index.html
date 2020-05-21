@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="de">
+    <head>
+        <meta charset="utf-8" />
+        <title>Corona-Verbreitung</title>
+        <link rel="stylesheet" href="map.css" />
+    </head>
+    <body>
+        <h1>Corona-Verbreitung</h1>
+
+        <form>
+            <label for="resolution">Resolutin</label>
+             <select id="resolution" name="resolution">
+              <option value="high">high</option>
+              <option value="medium">medium</option>
+              <option value="low">low</option>
+             </select>
+            <label for="state">Bundesland</label>
+             <select id="state" name="state"></select>
+            <label for="zoom">Zoom</label>
+             <input type="number" id="zoom" name="zoom" min="0" max="1000" value="1">
+          </form>
+
+
+        <svg width="1000" viewBox="0 0 100 100">
+            <path d = "M 21 54  L 23 57 L 27 56 L 29 58 L 32 57 L 031 56 L 29 54 L29 51 L31 50 L 27 51 L 23 52" fill="transparent" stroke="black"/>
+        </svg>
+
+        <script type="module" src="main.js"></script>
+    </body>
+</html>
