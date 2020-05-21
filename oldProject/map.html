@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html lang="de">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Corona-Map</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <div class="flexbox">
+    <div id="barcharts">
+      <select id="state" name="state" height="100" width="500 ">
+      </select>
+      <br>
+      <input type="radio" id="current" name="whatIsShown" value="current" checked="checked">
+      <label for="current">Current cases per 100k</label><br>
+      <input type="radio" id="lastWeek" name="whatIsShown" value="lastWeek">
+      <label for="lastWeek">Cases 100k last week</label><br>
+      <input type="radio" disabled id="all" name="whatIsShown" value="all">
+      <label for="all">All Cases</label>
+
+      <div>
+        <label for="howMany">How many Graphs?</label><br>
+        <input type="number" id="howMany" placeholder="5" min="1" max="21"></input>
+      </div>
+      <label for="colorpicker">Base Color LK: (0-360outlineAnim)</label><br>
+      <input type="number" id="colorpicker" name="colorpicker" value="240" min="0" max="360"><br>
+      <label for="colorOutline">Base Color Outline:</label><br>
+      <select id="colorOutline" name="colorOutline">
+        <option>black</option>
+        <option>red</option>
+        <option>green</option>
+        <option>blue</option>
+      </select><br>
+      <label for="colorOutline">Base Color Outline Animation:</label><br>
+      <select id="colorOutlineAnim" name="colorOutlineAnim">
+        <option>red</option>
+        <option>black</option>
+        <option>green</option>
+        <option>blue</option>
+        <option>Fuchsia</option>
+      </select><br>
+      <label for="colorpicker">Outline Animation Thickness</label><br>
+      <input type="number" id="outlineAnim" name="outlineAnim" value="3" min="2" max="8"><br>
+      <div>
+        <input type="checkbox" id="scale" value=true>
+        <label for="scale"> Graphen deutschlandweit skalieren?</label><br>
+      </div>
+      <svg id="barchart" height="1000" width="500" viewBox="0 0 100 100">
+      </svg>
+    </div>
+
+    <div class="tooltip">
+      <span class="tooltiptext" id="nametooltip"></span>
+      <svg id="map" height="1000" width="1000"
+        style="border: 1px solid black; background: linear-gradient( rgb(0, 0, 0), rgb(6, 0, 95) )"
+        transform="scale(-1,1)rotate(180)">
+      </svg>
+    </div>
+  </div>
+  <!-- The Modal -->
+  <div id="countyInfos" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="modalText"></div>
+    </div>
+
+  </div>
+
+  <script src="mapController.js" type="module"></script>
+  <script src="diagramm.js" type="module"></script>
+</body>
+
+</html>

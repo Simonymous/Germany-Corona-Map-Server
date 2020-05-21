@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Webanwendungen rules",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "test": "node server.js",
-    "start": "node server.js",
-    "main": "node main.js"
+    "start": "node server.js"
   },
   "keywords": [
     "server"

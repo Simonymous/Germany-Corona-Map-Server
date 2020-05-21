@@ -1,0 +1,104 @@
+path {
+	transition: stroke-width 1.5s, stroke 1.5s;
+	stroke-width: 0.5;
+}
+
+path:hover {
+	transform: scale(1.004);
+}
+
+.flexbox {
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	border: 2px solid #333;
+}
+
+#barcharts {
+	padding-top: 50px;
+	padding-left: 50px;
+	padding-right: 50px;
+}
+
+#barchart>rect {
+	stroke: black;
+	stroke-width: 0.1;
+	animation: draw 1s ease-in-out;
+	animation-name: build;
+	animation-duration: 2s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes build {
+	from {
+		visibility: hidden;
+		width: 0%
+	}
+	to {
+		visibility: visible;
+		/* width: $(getElementByClass("bar").width) */
+	}
+}
+
+.text {
+	font-size: 2px;
+	font-family: sans-serif;
+	fill: black;
+}
+
+option,
+select {
+	font-family: sans-serif;
+	font-size: 20px;
+}
+
+.tooltip {
+	width: 200px;
+	height: 200px;
+}
+
+.tooltip .tooltiptext {
+	visibility: hidden;
+	width: 150px;
+	background-color: lightgray;
+	color: black;
+	text-align: center;
+	padding: 5px 0;
+	border-radius: 6px;
+	font-size: large;
+	position: absolute;
+	z-index: 1;
+}
+
+.modal {
+	display: none;
+	/* Hidden by default */
+	position: fixed;
+	width: 200px;
+	height: 400px;
+}
+
+.modal-content {
+	background-color: #fefefe;
+	margin: auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%;
+}
+
+
+/* The Close Button */
+
+.close {
+	color: #aaaaaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+	color: #000;
+	text-decoration: none;
+	cursor: pointer;
+}

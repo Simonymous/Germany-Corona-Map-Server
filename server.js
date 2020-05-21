@@ -14,137 +14,134 @@
                     Philip, Pascal & Simon
  */
 
-
-const http = require('http')
-const path = require('path')
-const querystring = require('querystring')
-const fs = require('fs')
-const PORT = 8080
-const server = http.createServer()
+import { createServer } from 'http'
+import { extname as _extname } from 'path'
+import { parse } from 'querystring'
+import { readdirSync, readFileSync } from 'fs'
 
 // import {getMapCoordinates} from './getMapCoordinates.js'
-const getMapCoordinates = require('./getMapCoordinates.js')
+import { getMapCoordinates } from './getMapCoordinates.js'
+
+const PORT = 8080
+const server = createServer()
 
 let listOfFiles = []
-let dir = './'
-let File = {
-  biteStream: null,
-  fileName: null
-}
+const dir = './'
 
-files = fs.readdirSync("./");
+const files = readdirSync(dir)
 
 files.forEach(file => {
-  if(((file.includes('.js') || file.includes('.html') || file.includes('.css') )&!file.includes('.json'))){
-    fileType = fs.readFileSync('./'+ file);
+  if (((file.includes('.js') || file.includes('.html') || file.includes('.css')) & !file.includes('.json'))) {
+    const fileType = readFileSync('./' + file)
 
-   
-      /*
+    /*
 
-       FRAGEN: Warum wird das gebraucht? 
+      FRAGEN: Warum wird das gebraucht?
 
-       */
+      */
 
+    /* eslint-disable */
     let File = {
       biteStream: null,
       fileName: null
     }
+    /* eslint-enable */
+
     File.fileName = file
     File.biteStream = fileType
 
     listOfFiles.push(File)
   }
-
 })
 
-startServer(listOfFiles) 
+startServer(listOfFiles)
 
-function startServer(listOfFiles){
-  this.listOfFiles = listOfFiles
+function startServer (listOfFiless) {
+  listOfFiles = listOfFiless
   server.on('request', (request, response) => {
     console.log(`method:     ${request.method}`)
     console.log(`url:        ${request.url}`)
     console.log(`headers:    ${JSON.stringify(request.headers)}`)
     var userAgent = request.headers['user-agent']
     console.log(`user-agent: ${userAgent}\n`)
-  
+
     const headers = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
-      'Access-Control-Max-Age': 2592000, // 30 days
+      'Access-Control-Max-Age': 2592000 // 30 days
       /** add other headers as per requirement */
-    };
-    let newURL = ""
+    }
+    let newURL = ''
     response.writeHead(200, headers)
-    let extname = path.extname(request.url)
-    if(request.url.startsWith("/mapdata")){
-       extname = "mapdata"
-        newURL = request.url.replace("/mapdata?","");
+    let extname = _extname(request.url)
+    if (request.url.startsWith('/mapdata')) {
+      extname = 'mapdata'
+      newURL = request.url.replace('/mapdata?', '')
     }
 
-    //console.log( "Url Split: -"+ extname+"-")
+    // console.log( "Url Split: -"+ extname+"-")
+
+    let data
     switch (extname) {
-
       case '.css' :
-        //console.log("return css")
-        response.writeHead(200, {"Content-Type": "text/css"})
-       
+        // console.log("return css")
+        response.writeHead(200, { 'Content-Type': 'text/css' })
         listOfFiles.forEach(file => {
-           if("/"+file.fileName === request.url) {
-            response.write(file.biteStream)
-           }
-
-         })
-
-        break
-
-      case ".js" :
-        //console.log("return js")
-        response.writeHead(200, {"Content-Type": "application/javascript"})
-        listOfFiles.forEach(file => {
-          //console.log("JS!!! /"+file.fileName+" "+request.url)
-          if("/"+file.fileName === request.url) {
-            //console.log("IN IF")
+          if ('/' + file.fileName === request.url) {
             response.write(file.biteStream)
           }
-
         })
-        break 
+
+        break
+
+      case '.js' :
+        // console.log("return js")
+        response.writeHead(200, { 'Content-Type': 'application/javascript' })
+        listOfFiles.forEach(file => {
+          // console.log("JS!!! /"+file.fileName+" "+request.url)
+          if ('/' + file.fileName === request.url) {
+            // console.log("IN IF")
+            response.write(file.biteStream)
+          }
+        })
+        break
 
       case '.ico' :
-        //console.log("return ico")  
+        // console.log("return ico")
         break
-       case 'mapdata':
-         //console.log("IM MAPDATA")
-        let data = querystring.parse(newURL)
+      case 'mapdata':
+        // console.log("IM MAPDATA")
+        data = parse(newURL)
         console.log(data)
-        getDataFromQuery(data.BL_ID, data.resolution, data.zoom)
-        break 
+        response.write(getDataFromQuery(data.BL_ID, data.resolution, data.zoom))
+        break
 
       default :
-         //console.log("Return default")
-         response.writeHead(200, {"Content-Type": "text/html"})
-         
-         listOfFiles.forEach(file => {
+        // console.log("Return default")
+        response.writeHead(200, { 'Content-Type': 'text/html' })
+        listOfFiles.forEach(file => {
           console.log(file.fileName)
-           if(file.fileName === "index.html") {
+          if (file.fileName === 'index.html') {
             response.write(file.biteStream)
-           }
-         })
-         break
+          }
+        })
+        break
     }
-
     response.end()
   })
 
-  function getDataFromQuery(id,resolution,zoom) {
-    let coo = getMapCoordinates(id,resolution,zoom)
-    console.log(coo)
+  function getDataFromQuery (id, resolution, zoom) {
+    const coords = getMapCoordinates(id, resolution, zoom)
+    const jsonCoords = JSON.stringify(coords)
+
+    return jsonCoords
+    // Map Zeichnen
+    // coords in json an client schicken
+    // console.log(coords)
   }
 
   server.listen(PORT, 'localhost', () => {
     // called when server is successfully listening.
     console.log(`Server listening on: http://localhost:${PORT}`)
   })
-  
 }
