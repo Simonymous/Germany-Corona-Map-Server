@@ -18,17 +18,13 @@ import { createServer } from 'http'
 import { extname as _extname } from 'path'
 import { parse } from 'querystring'
 import { readdirSync, readFileSync } from 'fs'
-
-// import {getMapCoordinates} from './getMapCoordinates.js'
-import { getMapCoordinates } from './getMapCoordinates.js'
+import { getMapCoordinates, getCountys } from './getMapCoordinates.js'
 
 const PORT = 8080
 const server = createServer()
-
-let listOfFiles = []
 const dir = './'
-
 const files = readdirSync(dir)
+let listOfFiles = []
 
 files.forEach(file => {
   if (((file.includes('.js') || file.includes('.html') || file.includes('.css')) & !file.includes('.json'))) {
@@ -65,11 +61,11 @@ function startServer (listOfFiless) {
     var userAgent = request.headers['user-agent']
     console.log(`user-agent: ${userAgent}\n`)
 
+    // CORS aktivieren
     const headers = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
       'Access-Control-Max-Age': 2592000 // 30 days
-      /** add other headers as per requirement */
     }
     let newURL = ''
     response.writeHead(200, headers)
@@ -77,6 +73,9 @@ function startServer (listOfFiless) {
     if (request.url.startsWith('/mapdata')) {
       extname = 'mapdata'
       newURL = request.url.replace('/mapdata?', '')
+    }
+    if (request.url.startsWith('/county')) {
+      extname = 'county'
     }
 
     // console.log( "Url Split: -"+ extname+"-")
@@ -113,11 +112,20 @@ function startServer (listOfFiless) {
         // console.log("IM MAPDATA")
         data = parse(newURL)
         console.log(data)
-        response.write(getDataFromQuery(data.BL_ID, data.resolution, data.zoom))
+        if (data.windowSizeX && data.windowSizeY) {
+          response.write(getDataFromQuery(data.BL_ID, data.resolution, data.zoom, data.windowSizeX, data.windowSizeY))
+        } else {
+          response.write(getDataFromQuery(data.BL_ID, data.resolution, data.zoom))
+        }
+        break
+
+      case 'county':
+        const jsonCountys = JSON.stringify(getCountys())
+        console.log(jsonCountys)
+        response.write(jsonCountys)
         break
 
       default :
-        // console.log("Return default")
         response.writeHead(200, { 'Content-Type': 'text/html' })
         listOfFiles.forEach(file => {
           console.log(file.fileName)
@@ -133,11 +141,7 @@ function startServer (listOfFiless) {
   function getDataFromQuery (id, resolution, zoom) {
     const coords = getMapCoordinates(id, resolution, zoom)
     const jsonCoords = JSON.stringify(coords)
-
     return jsonCoords
-    // Map Zeichnen
-    // coords in json an client schicken
-    // console.log(coords)
   }
 
   server.listen(PORT, 'localhost', () => {

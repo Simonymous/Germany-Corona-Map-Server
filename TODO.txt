@@ -11,7 +11,8 @@ BL_ID: ID des Bundeslands, 0 für alle Bundesländer
 resolution: high, medium, low
 
 zoom: Zoomebene (0,1,2,3,…​)
-
+                          /county -> Liefert alle Bunesländer+ID
+                          /mapdata?BL_ID=10&resolution=medium&zoom=3&XWindow & YWindow
 Beispiel: Auf die Anfrage /mapdata?BL_ID=10&resolution=medium&zoom=3 liefert der Server die Geodaten 
 aller Kreise des Saarlandes mit mittlerer Auflösung in Web-Mercator-Koordinaten auf Zoomebene 3.
 

@@ -6,7 +6,7 @@ import { mapData } from './map-data.js'
 
 const data = mapData.features
 
-export function getMapCoordinates (BL_ID = 0, resulution = 'low', zoom = 10, windowsizeX = 100, windowsizeY = 100) {
+export function getMapCoordinates (BL_ID = 0, resulution = 'low', zoom = 6, windowsizeX = 1000, windowsizeY = 1000) {
   let coords = getCoordsInBL_ID(BL_ID, resulution)
 
   coords = getMercatorCoordinates(coords, zoom)
@@ -16,6 +16,30 @@ export function getMapCoordinates (BL_ID = 0, resulution = 'low', zoom = 10, win
   // drawpath(coords)
 
   return coords
+}
+
+export function getCountys () {
+  const stateList = []
+  let state
+  /* eslint-disable */  
+  data.forEach(element => {
+    stateList.push(state = { name: element.attributes.BL, id: element.attributes.BL_ID })
+  })
+  const uniqueStateList = []
+  const map = new Map()
+  for (const item of stateList) {
+    if (!map.has(item.name)) {
+      map.set(item.name, true) // set any value to Map
+      uniqueStateList.push({
+        name: item.name,
+        id: item.id
+      })
+    }
+  }
+
+  uniqueStateList.push(state = { id: 0, name: 'Alle' })
+  uniqueStateList.sort((a, b) => (a.name > b.name) ? 1 : -1)
+  return uniqueStateList
 }
 // main(10);
 
@@ -30,7 +54,7 @@ function getCoordsInBL_ID (BL_ID, resolution) {
 
   data.forEach(element => {
     // Only the BL that were selected
-    if (BL_ID === 0 || element.attributes.BL_ID === BL_ID) {
+    if (BL_ID === '0' || element.attributes.BL_ID === BL_ID) {
       // console.log(element.geometry.rings)
       // Every Area of the BEZ
       element.geometry.rings.forEach((value, BEZIndex) => {
@@ -58,7 +82,6 @@ function getCoordsInBL_ID (BL_ID, resolution) {
       })
     }
   })
-
   return coords
 }
 
@@ -75,7 +98,7 @@ function getMercatorCoordinates (coordsDec, zoom) {
  * @param {number[][]} coords The Web Mercator coords retuned by the convertCoordinates function
  * @return {number[][]} The coords, but centered.
  */
-function fitCoordsToPanel (coords) {
+function fitCoordsToPanel (coords, windowsizeX, windowsizeY) {
   let maxX, maxY
   maxX = Number.MIN_SAFE_INTEGER
   maxY = Number.MIN_SAFE_INTEGER
@@ -101,27 +124,38 @@ function fitCoordsToPanel (coords) {
   })
 
   const middleX = (minX + maxX) / 2
-  const middleY = (minY + minY) / 2
+  const middleY = (minY + maxY) / 2
 
-  console.log(minX + ' | ' + maxX)
+  const outputArray = [[]]
+  const zeroMinusFourthOfWindowX = -(0.25 * windowsizeX)
+  const zeroMinusFourthOfWindowY = -(0.25 * windowsizeY)
+  const windowsizeXPlusFourth = 1.25 * windowsizeX
+  const windowsizeYPlusFourth = 1.25 * windowsizeY
 
   coords.forEach((item, index, array) => {
     item.forEach((item2, index2, array2) => {
-      array[index][index2][0] = item2[0] - middleX + 500
-      array[index][index2][1] = item2[1] - middleY + 500
+      array[index][index2][0] = item2[0] - middleX + windowsizeX / 2
+      array[index][index2][1] = item2[1] - middleY + windowsizeY / 2
     })
 
-    // console.log(coords)
+    outputArray.push([])
+    // console.log(outputArray);
 
-    // for Performance
-    // removes hidden coordinates
+    item.forEach((item2, index2, array2) => {
+      // for less Network traffic
+      // removes hidden coordinates
 
-    // if(item[0] < 0 || item[0] > windowsizeX || item[1] < 0 || item[1] > windowsizeY){
-    //     object.slice(index, 1);
-    // }
+      if (array2[index2][0] > zeroMinusFourthOfWindowX && array2[index2][0] < windowsizeXPlusFourth && array2[index2][1] > zeroMinusFourthOfWindowY && array2[index2][1] < windowsizeYPlusFourth) {
+        // console.log(array[index][index2]);
+        outputArray[index].push(array2[index2])
+        // console.log(array[index][index2]);
+      }
+    })
   })
 
-  return coords
+  // console.log(coords)
+
+  return outputArray
 }
 
 /**
