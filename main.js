@@ -1,4 +1,3 @@
-
 // import {mapData} from './map-data.js';
 // const mapData = require ('./map-data.js');
 // const data = mapData.features
@@ -29,7 +28,6 @@ function generateMapDataQueryString () {
   const zoom = document.getElementById('zoom').value
 
   const queryString = serverURL + '/mapdata' + '?BL_ID=' + BL_ID + '&resolution=' + resolution + '&zoom=' + zoom
-  console.log('Generierter Query: ' + queryString)
   const responsePromise = fetchAsync(queryString)
 
   responsePromise.then(
@@ -45,22 +43,11 @@ function generateMapDataQueryString () {
 }
 
 async function fetchAsync (url) {
-  document.getElementById("overlay").style.display = "block";
+  document.getElementById('overlay').style.display = 'block'
   const response = await fetch(url)
   const responsePromise = await response.json()
-  // data = 'LEER'
   return responsePromise
 }
-
-/** function getRequest(queryString) {
-    var xmlHttp = new XMLHttpRequest()
-    xmlHttp.onreadystatechange = function() {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-            aCallback(xmlHttp.responseText);
-    }
-    xmlHttp.open( "GET", queryString, true );
-    xmlHttp.send(null)
-}**/
 
 /* Schreibt die Bundesländer in die select Liste */
 function stateInselct () {
@@ -83,14 +70,8 @@ function stateInselct () {
 }
 
 function drawSVG (coords) {
-  // console.log(coords)
-  // console.log(typeof (coords))
-
   let output = ''
-  //   const svg = document.getElementsByTagName('svg')[0]
-  //   while (svg.lastChild) {
-  //     svg.removeChild(svg.lastChild)
-  //   }
+
   coords.forEach(rings => {
     rings.forEach((coords, index) => {
       const x = coords[0]
@@ -101,13 +82,12 @@ function drawSVG (coords) {
       } else {
         output += ` L ${x} ${y}`
       }
-      // coords = [-754756.5, 49823]
     })
   })
   const path = createPath(output)
 
   mapContainer.appendChild(path)
-  document.getElementById("overlay").style.display = "none";
+  document.getElementById('overlay').style.display = 'none'
 }
 
 /**
@@ -118,9 +98,6 @@ function createPath (output) {
   document.getElementById('map').innerHTML = ''
   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
   path.setAttribute('d', output)
-  // path.setAttribute('style', 'stroke-width: 0.2')
-  // path.setAttribute('stroke', strokecolor)
-  // path.setAttribute('fill', `hsl(${color}, 100%, ${brightnessPercentage}%)`)
   return path
 }
 

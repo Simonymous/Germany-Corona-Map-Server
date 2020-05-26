@@ -22,33 +22,54 @@ import { getMapCoordinates, getCountys } from './getMapCoordinates.js'
 
 const PORT = 8080
 const server = createServer()
-const dir = './'
-const files = readdirSync(dir)
+let dir = './' // Default
+let files
 let listOfFiles = []
+// Argument auslesen
+const args = process.argv.slice(2)
+if (args[0]) {
+  dir = args[0]
+}
 
-files.forEach(file => {
-  if (((file.includes('.js') || file.includes('.html') || file.includes('.css')) & !file.includes('.json'))) {
-    const fileType = readFileSync('./' + file)
+try {
+  console.log('Server wird gestartet mit root: ' + dir)
+  files = readdirSync(dir)
 
-    /*
-
-      FRAGEN: Warum wird das gebraucht?
-
-      */
-
-    /* eslint-disable */
-    let File = {
-      biteStream: null,
-      fileName: null
-    }
-    /* eslint-enable */
-
-    File.fileName = file
-    File.biteStream = fileType
-
-    listOfFiles.push(File)
+  populateDir()
+} catch (err) {
+  if (err.code === 'ENOENT') {
+    console.log('dir doesnt exist!')
+  } else {
+    throw err
   }
-})
+}
+
+function populateDir () {
+  files.forEach(file => {
+    if (((file.includes('.js') || file.includes('.html') || file.includes('.css')) & !file.includes('.json'))) {
+      try {
+        const fileType = readFileSync(dir + file)
+        /*
+
+        FRAGEN: Warum wird das gebraucht?
+
+        */
+
+        const File = {
+          biteStream: null,
+          fileName: null
+        }
+
+        File.fileName = file
+        File.biteStream = fileType
+
+        listOfFiles.push(File)
+      } catch (err) {
+        throw err
+      }
+    }
+  })
+}
 
 startServer(listOfFiles)
 
@@ -78,12 +99,9 @@ function startServer (listOfFiless) {
       extname = 'county'
     }
 
-    // console.log( "Url Split: -"+ extname+"-")
-
     let data
     switch (extname) {
       case '.css' :
-        // console.log("return css")
         response.writeHead(200, { 'Content-Type': 'text/css' })
         listOfFiles.forEach(file => {
           if ('/' + file.fileName === request.url) {
@@ -94,24 +112,18 @@ function startServer (listOfFiless) {
         break
 
       case '.js' :
-        // console.log("return js")
         response.writeHead(200, { 'Content-Type': 'application/javascript' })
         listOfFiles.forEach(file => {
-          // console.log("JS!!! /"+file.fileName+" "+request.url)
           if ('/' + file.fileName === request.url) {
-            // console.log("IN IF")
             response.write(file.biteStream)
           }
         })
         break
 
       case '.ico' :
-        // console.log("return ico")
         break
       case 'mapdata':
-        // console.log("IM MAPDATA")
         data = parse(newURL)
-        console.log(data)
         if (data.windowSizeX && data.windowSizeY) {
           response.write(getDataFromQuery(data.BL_ID, data.resolution, data.zoom, data.windowSizeX, data.windowSizeY))
         } else {
@@ -121,14 +133,12 @@ function startServer (listOfFiless) {
 
       case 'county':
         const jsonCountys = JSON.stringify(getCountys())
-        console.log(jsonCountys)
         response.write(jsonCountys)
         break
 
       default :
         response.writeHead(200, { 'Content-Type': 'text/html' })
         listOfFiles.forEach(file => {
-          console.log(file.fileName)
           if (file.fileName === 'index.html') {
             response.write(file.biteStream)
           }
@@ -141,7 +151,11 @@ function startServer (listOfFiless) {
   function getDataFromQuery (id, resolution, zoom) {
     const coords = getMapCoordinates(id, resolution, zoom)
     const jsonCoords = JSON.stringify(coords)
-    return jsonCoords
+    if (jsonCoords) {
+      return jsonCoords
+    } else {
+      throw 'Coords undefined!'
+    }
   }
 
   server.listen(PORT, 'localhost', () => {
